@@ -3,6 +3,8 @@ import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { MessageSquare, ShieldAlert, Users } from 'lucide-react';
 import { useAuth, type Role } from '../auth/AuthContext';
 
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL || ''}/api`;
+
 export function Login() {
   const { login } = useAuth();
   const [error, setError] = useState('');
@@ -18,7 +20,7 @@ export function Login() {
     setError('');
 
     try {
-      const res = await fetch('/api/auth/me', {
+      const res = await fetch(`${API_BASE}/auth/me`, {
         headers: { Authorization: `Bearer ${response.credential}` },
       });
 
@@ -45,13 +47,13 @@ export function Login() {
     setError('');
 
     try {
-      const res = await fetch('/api/auth/guest', { method: 'POST' });
+      const res = await fetch(`${API_BASE}/auth/guest`, { method: 'POST' });
       if (!res.ok) {
         setError('Could not start guest session. Please try again.');
         return;
       }
       const data = await res.json();
-      const guestMe = await fetch('/api/auth/me', {
+      const guestMe = await fetch(`${API_BASE}/auth/me`, {
         headers: { Authorization: `Bearer ${data.token}` },
       });
       const meData = guestMe.ok ? await guestMe.json() : {};

@@ -24,7 +24,7 @@ export function Integration() {
   });
 
   const selectedBot = bots?.find((b) => b.id === selectedBotId);
-  const apiUrl = window.location.origin;
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 
   return (
     <div>

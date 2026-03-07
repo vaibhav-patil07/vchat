@@ -1,4 +1,5 @@
-const BASE = '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const BASE = `${API_BASE_URL}/api`;
 
 function getAuthHeaders(): Record<string, string> {
   const token = localStorage.getItem('vchat_token');
