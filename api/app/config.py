@@ -18,6 +18,11 @@ class Settings(BaseSettings):
 
     cors_origins: str = "http://localhost:5173,http://localhost:5174"
 
+    admin_email: str = ""
+    google_client_id: str = ""
+    secret_key: str = "change-me-in-production"
+    guest_bot_limit: int = 3
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
 

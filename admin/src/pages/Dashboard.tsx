@@ -1,17 +1,29 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Plus, Settings, BookOpen, MessageSquare, Trash2 } from 'lucide-react';
+import { Plus, Settings, BookOpen, MessageSquare, Trash2, Filter } from 'lucide-react';
 import { api, type Bot } from '../api/client';
+import { useAuth } from '../auth/AuthContext';
 
 export function Dashboard() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
+  const [ownerFilter, setOwnerFilter] = useState('');
+
+  const isAdmin = user?.role === 'admin';
+  const isGuest = user?.role === 'guest';
 
   const { data: bots, isLoading } = useQuery({
-    queryKey: ['bots'],
-    queryFn: api.bots.list,
+    queryKey: ['bots', ownerFilter],
+    queryFn: () => api.bots.list(ownerFilter || undefined),
+  });
+
+  const { data: users } = useQuery({
+    queryKey: ['users'],
+    queryFn: api.users.list,
+    enabled: isAdmin,
   });
 
   const createMutation = useMutation({
@@ -33,6 +45,22 @@ export function Dashboard() {
     if (newName.trim()) createMutation.mutate(newName.trim());
   };
 
+  const botLimit = user?.botLimit;
+  const atLimit = botLimit != null && (bots?.length ?? 0) >= botLimit;
+
+  const ownerOptions: { value: string; label: string }[] = [
+    { value: '', label: 'All users' },
+    { value: user?.email ?? '', label: 'My bots' },
+    { value: 'guest', label: 'Guest bots' },
+  ];
+  if (users) {
+    for (const u of users) {
+      if (u.email !== user?.email) {
+        ownerOptions.push({ value: u.email, label: u.email });
+      }
+    }
+  }
+
   if (isLoading) {
     return <div className="flex justify-center py-20"><div className="animate-spin h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full" /></div>;
   }
@@ -42,15 +70,37 @@ export function Dashboard() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Bots</h1>
-          <p className="mt-1 text-sm text-gray-500">Create and manage your chatbots</p>
+          <p className="mt-1 text-sm text-gray-500">
+            {botLimit != null
+              ? `${bots?.length ?? 0} / ${botLimit} bots`
+              : 'Create and manage your chatbots'}
+          </p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Create Bot
-        </button>
+        <div className="flex items-center gap-3">
+          {isAdmin && (
+            <div className="relative">
+              <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              <select
+                value={ownerFilter}
+                onChange={(e) => setOwnerFilter(e.target.value)}
+                className="pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none"
+              >
+                {ownerOptions.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <button
+            onClick={() => setShowCreate(true)}
+            disabled={atLimit}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title={atLimit ? 'Guest bot limit reached' : undefined}
+          >
+            <Plus className="w-4 h-4" />
+            Create Bot
+          </button>
+        </div>
       </div>
 
       {showCreate && (
@@ -76,14 +126,18 @@ export function Dashboard() {
         <div className="text-center py-20">
           <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-1">No bots yet</h3>
-          <p className="text-sm text-gray-500 mb-4">Create your first chatbot to get started</p>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700"
-          >
-            <Plus className="w-4 h-4" />
-            Create Bot
-          </button>
+          <p className="text-sm text-gray-500 mb-4">
+            {ownerFilter ? 'No bots found for this filter' : 'Create your first chatbot to get started'}
+          </p>
+          {!ownerFilter && (
+            <button
+              onClick={() => setShowCreate(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700"
+            >
+              <Plus className="w-4 h-4" />
+              Create Bot
+            </button>
+          )}
         </div>
       )}
 
@@ -99,9 +153,15 @@ export function Dashboard() {
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-gray-500 mb-1">
               {bot.provider}/{bot.model_name}
             </p>
+            {isAdmin && (
+              <p className="text-[11px] text-gray-400 mb-3 truncate">
+                by {bot.created_by}
+              </p>
+            )}
+            {!isAdmin && <div className="mb-3" />}
             <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
               <span className="flex items-center gap-1"><BookOpen className="w-3.5 h-3.5" />{bot.document_count} docs</span>
               <span className="flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" />{bot.conversation_count} chats</span>

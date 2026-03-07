@@ -6,8 +6,9 @@ from app.models.bot import Bot
 from app.models.document import Document
 from app.schemas.document import DocumentResponse
 from app.services.rag import extract_text, chunk_text, add_chunks, remove_document_chunks
+from app.auth import require_auth
 
-router = APIRouter(tags=["documents"])
+router = APIRouter(tags=["documents"], dependencies=[Depends(require_auth)])
 
 ALLOWED_TYPES = {
     "application/pdf",

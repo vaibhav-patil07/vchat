@@ -28,6 +28,7 @@ class BotResponse(BaseModel):
     model_name: str
     temperature: float
     max_tokens: int
+    created_by: str = "admin"
     created_at: datetime
     document_count: int = 0
     conversation_count: int = 0

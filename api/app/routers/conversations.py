@@ -5,8 +5,9 @@ from app.database import get_db
 from app.models.bot import Bot
 from app.models.conversation import Conversation, Message
 from app.schemas.chat import ConversationResponse, ConversationListItem, MessageResponse
+from app.auth import require_auth
 
-router = APIRouter(tags=["conversations"])
+router = APIRouter(tags=["conversations"], dependencies=[Depends(require_auth)])
 
 
 @router.get("/bots/{bot_id}/conversations", response_model=list[ConversationListItem])

@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.database import init_db
-from app.routers import bots, documents, chat, conversations
+from app.routers import admin, auth, bots, documents, chat, conversations
 
 
 @asynccontextmanager
@@ -23,6 +23,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
 app.include_router(bots.router, prefix="/api")
 app.include_router(documents.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
