@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Code2, MessageSquare, PanelRight, Puzzle, ExternalLink } from 'lucide-react';
-import { VChatProvider, ChatWidget, ChatWindow, useVChat } from '@vchat/react';
+import { Code2, MessageSquare, PanelRight, Puzzle } from 'lucide-react';
+import { VChatProvider, ChatWidget, ChatWindow, useVChat, type ChatMessage } from '@vchat/react';
 import '@vchat/react/style.css';
 import { api, type Bot } from '../api/client';
 import { CodeBlock } from '../components/CodeBlock';
@@ -87,7 +87,7 @@ export function Integration() {
         <VChatProvider apiUrl={apiUrl} botId={selectedBotId}>
           {tab === 'widget' && <WidgetTab botId={selectedBotId} botName={selectedBot?.name ?? ''} apiUrl={apiUrl} />}
           {tab === 'inline' && <InlineTab botName={selectedBot?.name ?? ''} apiUrl={apiUrl} />}
-          {tab === 'headless' && <HeadlessTab apiUrl={apiUrl} />}
+          {tab === 'headless' && <HeadlessTab />}
         </VChatProvider>
       ) : (
         <div className="text-center py-16 bg-card rounded-xl border border-border">
@@ -244,7 +244,7 @@ function SupportPage() {
 
 /* ---------- Headless Tab ---------- */
 
-function HeadlessTab({ apiUrl }: { apiUrl: string }) {
+function HeadlessTab() {
   return (
     <div className="grid gap-6 lg:grid-cols-2 items-start">
       <div>
@@ -334,7 +334,7 @@ function CustomChatUI() {
             This chat uses the headless <code className="px-1 py-0.5 bg-secondary rounded text-xs font-mono">useVChat()</code> hook with a fully custom UI.
           </p>
         )}
-        {messages.map((msg) => (
+        {messages.map((msg: ChatMessage) => (
           <div key={msg.id} className="mb-3">
             <div className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${
               msg.role === 'user' ? 'text-primary' : 'text-green-600 dark:text-green-400'

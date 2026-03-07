@@ -13,7 +13,6 @@ export function Dashboard() {
   const [ownerFilter, setOwnerFilter] = useState('');
 
   const isAdmin = user?.role === 'admin';
-  const isGuest = user?.role === 'guest';
 
   const { data: bots, isLoading } = useQuery({
     queryKey: ['bots', ownerFilter],
