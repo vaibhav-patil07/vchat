@@ -66,7 +66,7 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="min-h-screen flex items-center justify-center bg-primary">
       <div className="w-full max-w-sm">
         <div className="bg-card rounded-2xl shadow-lg border border-border p-8">
           <div className="flex flex-col items-center mb-8">

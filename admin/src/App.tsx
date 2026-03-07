@@ -4,6 +4,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ThemeProvider } from './theme/ThemeContext';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import { Layout } from './components/Layout';
+import { Landing } from './pages/Landing';
 import { Dashboard } from './pages/Dashboard';
 import { BotSettings } from './pages/BotSettings';
 import { KnowledgeBase } from './pages/KnowledgeBase';
@@ -18,10 +19,17 @@ const queryClient = new QueryClient({
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '';
 
-function ProtectedRoutes() {
+function AppRoutes() {
   const { user } = useAuth();
 
-  if (!user) return <Login />;
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Landing />} />
+      </Routes>
+    );
+  }
 
   return (
     <Routes>
@@ -45,7 +53,7 @@ export default function App() {
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-              <ProtectedRoutes />
+              <AppRoutes />
             </BrowserRouter>
           </QueryClientProvider>
         </AuthProvider>
