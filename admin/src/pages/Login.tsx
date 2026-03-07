@@ -64,27 +64,27 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-sm">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+        <div className="bg-card rounded-2xl shadow-lg border border-border p-8">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center mb-4">
-              <MessageSquare className="w-7 h-7 text-indigo-600" />
+            <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+              <MessageSquare className="w-7 h-7 text-primary" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">VChat Admin</h1>
-            <p className="text-sm text-gray-500 mt-1">Sign in to manage your bots</p>
+            <h1 className="text-2xl font-bold text-card-foreground">VChat Admin</h1>
+            <p className="text-sm text-muted-foreground mt-1">Sign in to manage your bots</p>
           </div>
 
           {error && (
-            <div className="mb-6 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            <div className="mb-6 flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive">
               <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {verifying ? (
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500 py-4">
-              <div className="animate-spin h-4 w-4 border-2 border-indigo-600 border-t-transparent rounded-full" />
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground py-4">
+              <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
               Verifying...
             </div>
           ) : (
@@ -102,22 +102,22 @@ export function Login() {
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
+                  <div className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white px-3 text-gray-400">or</span>
+                  <span className="bg-card px-3 text-muted-foreground">or</span>
                 </div>
               </div>
 
               <button
                 onClick={handleGuestLogin}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-input rounded-lg text-sm font-medium text-secondary-foreground hover:bg-accent transition-colors"
               >
                 <Users className="w-4 h-4" />
                 Continue as Guest
               </button>
 
-              <p className="text-xs text-gray-400 text-center">
+              <p className="text-xs text-muted-foreground text-center">
                 Guests can create up to 3 bots to try things out.
               </p>
             </div>

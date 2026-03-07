@@ -54,57 +54,57 @@ export function BotSettings() {
   const currentProvider = PROVIDERS.find(p => p.value === form.provider);
 
   if (isLoading) {
-    return <div className="flex justify-center py-20"><div className="animate-spin h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full" /></div>;
+    return <div className="flex justify-center py-20"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
   }
 
-  if (!bot) return <div className="text-center py-20 text-gray-500">Bot not found</div>;
+  if (!bot) return <div className="text-center py-20 text-muted-foreground">Bot not found</div>;
 
   return (
     <div className="max-w-2xl">
-      <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 mb-6">
+      <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6">
         <ArrowLeft className="w-4 h-4" />
         Back to Bots
       </Link>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Bot Settings</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">Bot Settings</h1>
 
       <form onSubmit={handleSave} className="space-y-6">
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5">
+        <div className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <label className="block text-sm font-medium text-card-foreground mb-1">Name</label>
             <input
               type="text"
               value={form.name || ''}
               onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">System Prompt</label>
+            <label className="block text-sm font-medium text-card-foreground mb-1">System Prompt</label>
             <textarea
               rows={6}
               value={form.system_prompt || ''}
               onChange={(e) => setForm(f => ({ ...f, system_prompt: e.target.value }))}
               placeholder="You are a helpful assistant..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y"
+              className="w-full px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-y"
             />
-            <p className="mt-1 text-xs text-gray-400">Define how the bot should behave, its persona, and any rules</p>
+            <p className="mt-1 text-xs text-muted-foreground">Define how the bot should behave, its persona, and any rules</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5">
-          <h2 className="font-semibold text-gray-900">Model Configuration</h2>
+        <div className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-5">
+          <h2 className="font-semibold text-card-foreground">Model Configuration</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Provider</label>
+            <label className="block text-sm font-medium text-card-foreground mb-1">Provider</label>
             <select
               value={form.provider || 'ollama'}
               onChange={(e) => {
                 const p = PROVIDERS.find(p => p.value === e.target.value);
                 setForm(f => ({ ...f, provider: e.target.value, model_name: p?.models[0] }));
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
               {PROVIDERS.map(p => (
                 <option key={p.value} value={p.value}>{p.label}</option>
@@ -113,11 +113,11 @@ export function BotSettings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+            <label className="block text-sm font-medium text-card-foreground mb-1">Model</label>
             <select
               value={form.model_name || ''}
               onChange={(e) => setForm(f => ({ ...f, model_name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
               {currentProvider?.models.map(m => (
                 <option key={m} value={m}>{m}</option>
@@ -126,7 +126,7 @@ export function BotSettings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-card-foreground mb-1">
               Temperature: {form.temperature?.toFixed(1)}
             </label>
             <input
@@ -136,23 +136,23 @@ export function BotSettings() {
               step="0.1"
               value={form.temperature ?? 0.7}
               onChange={(e) => setForm(f => ({ ...f, temperature: parseFloat(e.target.value) }))}
-              className="w-full accent-indigo-600"
+              className="w-full accent-primary"
             />
-            <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <div className="flex justify-between text-xs text-muted-foreground mt-1">
               <span>Precise</span>
               <span>Creative</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Max Tokens</label>
+            <label className="block text-sm font-medium text-card-foreground mb-1">Max Tokens</label>
             <input
               type="number"
               min={1}
               max={8192}
               value={form.max_tokens ?? 1024}
               onChange={(e) => setForm(f => ({ ...f, max_tokens: parseInt(e.target.value) || 1024 }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
         </div>
@@ -160,7 +160,7 @@ export function BotSettings() {
         <button
           type="submit"
           disabled={updateMutation.isPending}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saved ? <><Check className="w-4 h-4" /> Saved</> : <><Save className="w-4 h-4" /> {updateMutation.isPending ? 'Saving...' : 'Save Changes'}</>}
         </button>

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { ThemeProvider } from './theme/ThemeContext';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
@@ -8,6 +9,7 @@ import { BotSettings } from './pages/BotSettings';
 import { KnowledgeBase } from './pages/KnowledgeBase';
 import { TestChat } from './pages/TestChat';
 import { Users } from './pages/Users';
+import { Integration } from './pages/Integration';
 import { Login } from './pages/Login';
 
 const queryClient = new QueryClient({
@@ -26,6 +28,7 @@ function ProtectedRoutes() {
       <Route element={<Layout />}>
         <Route path="/" element={<Dashboard />} />
         {user.role === 'admin' && <Route path="/users" element={<Users />} />}
+        <Route path="/integration" element={<Integration />} />
         <Route path="/bots/:id/settings" element={<BotSettings />} />
         <Route path="/bots/:id/knowledge" element={<KnowledgeBase />} />
         <Route path="/bots/:id/chat" element={<TestChat />} />
@@ -37,14 +40,16 @@ function ProtectedRoutes() {
 
 export default function App() {
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <ProtectedRoutes />
-          </BrowserRouter>
-        </QueryClientProvider>
-      </AuthProvider>
-    </GoogleOAuthProvider>
+    <ThemeProvider>
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <BrowserRouter>
+              <ProtectedRoutes />
+            </BrowserRouter>
+          </QueryClientProvider>
+        </AuthProvider>
+      </GoogleOAuthProvider>
+    </ThemeProvider>
   );
 }
