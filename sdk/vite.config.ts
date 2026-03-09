@@ -11,9 +11,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'VChatReact',
+      name: 'VChat7React',
       formats: ['es', 'umd'],
-      fileName: (format) => `vchat-react.${format === 'es' ? 'es' : 'umd'}.js`,
+      fileName: (format) => `vchat7-react.${format === 'es' ? 'es' : 'umd'}.js`,
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'react/jsx-runtime'],
