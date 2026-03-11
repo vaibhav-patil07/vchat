@@ -1,25 +1,36 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Code2, MessageSquare, PanelRight, Puzzle } from 'lucide-react';
-import { VChatProvider, ChatWidget, ChatWindow, useVChat, type ChatMessage } from '@vchat/react';
-import '@vchat/react/style.css';
-import { api, type Bot } from '../api/client';
-import { CodeBlock } from '../components/CodeBlock';
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Code2, MessageSquare, PanelRight, Puzzle } from "lucide-react";
+import {
+  VChatProvider,
+  ChatWidget,
+  ChatWindow,
+  useVChat,
+  type ChatMessage,
+} from "@vchat/react";
+import "@vchat/react/style.css";
+import { api, type Bot } from "../api/client";
+import { CodeBlock } from "../components/CodeBlock";
 
-type Tab = 'widget' | 'inline' | 'headless';
+type Tab = "widget" | "inline" | "headless";
 
 const tabs: { id: Tab; label: string; icon: typeof Code2; desc: string }[] = [
-  { id: 'widget', label: 'ChatWidget', icon: MessageSquare, desc: 'Floating bubble' },
-  { id: 'inline', label: 'ChatWindow', icon: PanelRight, desc: 'Inline embed' },
-  { id: 'headless', label: 'useVChat', icon: Puzzle, desc: 'Custom hook' },
+  {
+    id: "widget",
+    label: "ChatWidget",
+    icon: MessageSquare,
+    desc: "Floating bubble",
+  },
+  { id: "inline", label: "ChatWindow", icon: PanelRight, desc: "Inline embed" },
+  { id: "headless", label: "useVChat", icon: Puzzle, desc: "Custom hook" },
 ];
 
 export function Integration() {
-  const [tab, setTab] = useState<Tab>('widget');
-  const [selectedBotId, setSelectedBotId] = useState('');
+  const [tab, setTab] = useState<Tab>("widget");
+  const [selectedBotId, setSelectedBotId] = useState("");
 
   const { data: bots } = useQuery({
-    queryKey: ['bots'],
+    queryKey: ["bots"],
     queryFn: () => api.bots.list(),
   });
 
@@ -31,21 +42,28 @@ export function Integration() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">SDK Integration</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Embed a VChat bot into any React application with <code className="px-1.5 py-0.5 bg-secondary rounded text-xs font-mono">@vchat/react</code>
+          Embed a VChat bot into any React application with{" "}
+          <code className="px-1.5 py-0.5 bg-secondary rounded text-xs font-mono">
+            vchat7
+          </code>
         </p>
       </div>
 
       {/* Install + Bot selector */}
       <div className="grid gap-4 sm:grid-cols-2 mb-8">
         <div className="bg-card rounded-xl border border-border shadow-sm p-5">
-          <h3 className="text-sm font-semibold text-card-foreground mb-3">1. Install the SDK</h3>
+          <h3 className="text-sm font-semibold text-card-foreground mb-3">
+            1. Install the SDK
+          </h3>
           <div className="bg-[#1e293b] rounded-lg px-4 py-3 font-mono text-sm text-[#e2e8f0]">
-            npm install @vchat/react
+            npm install vchat7
           </div>
         </div>
 
         <div className="bg-card rounded-xl border border-border shadow-sm p-5">
-          <h3 className="text-sm font-semibold text-card-foreground mb-3">2. Select a bot to preview</h3>
+          <h3 className="text-sm font-semibold text-card-foreground mb-3">
+            2. Select a bot to preview
+          </h3>
           <select
             value={selectedBotId}
             onChange={(e) => setSelectedBotId(e.target.value)}
@@ -53,7 +71,9 @@ export function Integration() {
           >
             <option value="">Choose a bot...</option>
             {bots?.map((bot: Bot) => (
-              <option key={bot.id} value={bot.id}>{bot.name}</option>
+              <option key={bot.id} value={bot.id}>
+                {bot.name}
+              </option>
             ))}
           </select>
         </div>
@@ -70,13 +90,15 @@ export function Integration() {
               onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg border-b-2 transition-colors ${
                 active
-                  ? 'border-primary text-primary bg-primary/5'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                  ? "border-primary text-primary bg-primary/5"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               }`}
             >
               <Icon className="w-4 h-4" />
               <span>{t.label}</span>
-              <span className="hidden sm:inline text-xs opacity-60">{t.desc}</span>
+              <span className="hidden sm:inline text-xs opacity-60">
+                {t.desc}
+              </span>
             </button>
           );
         })}
@@ -85,15 +107,27 @@ export function Integration() {
       {/* Tab content */}
       {selectedBotId ? (
         <VChatProvider apiUrl={apiUrl} botId={selectedBotId}>
-          {tab === 'widget' && <WidgetTab botId={selectedBotId} botName={selectedBot?.name ?? ''} apiUrl={apiUrl} />}
-          {tab === 'inline' && <InlineTab botName={selectedBot?.name ?? ''} apiUrl={apiUrl} />}
-          {tab === 'headless' && <HeadlessTab />}
+          {tab === "widget" && (
+            <WidgetTab
+              botId={selectedBotId}
+              botName={selectedBot?.name ?? ""}
+              apiUrl={apiUrl}
+            />
+          )}
+          {tab === "inline" && (
+            <InlineTab botName={selectedBot?.name ?? ""} apiUrl={apiUrl} />
+          )}
+          {tab === "headless" && <HeadlessTab />}
         </VChatProvider>
       ) : (
         <div className="text-center py-16 bg-card rounded-xl border border-border">
           <Code2 className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-          <p className="text-sm font-medium text-foreground mb-1">Select a bot to see the live preview</p>
-          <p className="text-xs text-muted-foreground">Pick a bot from the dropdown above to test each integration mode</p>
+          <p className="text-sm font-medium text-foreground mb-1">
+            Select a bot to see the live preview
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Pick a bot from the dropdown above to test each integration mode
+          </p>
         </div>
       )}
     </div>
@@ -102,32 +136,47 @@ export function Integration() {
 
 /* ---------- Widget Tab ---------- */
 
-function WidgetTab({ botId, botName, apiUrl }: { botId: string; botName: string; apiUrl: string }) {
-  const [position, setPosition] = useState<'bottom-right' | 'bottom-left'>('bottom-right');
-  const [primaryColor, setPrimaryColor] = useState('#6366f1');
+function WidgetTab({
+  botId,
+  botName,
+  apiUrl,
+}: {
+  botId: string;
+  botName: string;
+  apiUrl: string;
+}) {
+  const [position, setPosition] = useState<"bottom-right" | "bottom-left">(
+    "bottom-right",
+  );
+  const [primaryColor, setPrimaryColor] = useState("#6366f1");
 
   return (
     <div>
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-5">
           <div>
-            <h3 className="font-semibold text-card-foreground mb-1">ChatWidget</h3>
+            <h3 className="font-semibold text-card-foreground mb-1">
+              ChatWidget
+            </h3>
             <p className="text-sm text-muted-foreground">
-              A floating chat bubble in the corner of the page. Click the bubble to try it.
+              A floating chat bubble in the corner of the page. Click the bubble
+              to try it.
             </p>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Position</label>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              Position
+            </label>
             <div className="flex gap-2">
-              {(['bottom-right', 'bottom-left'] as const).map((p) => (
+              {(["bottom-right", "bottom-left"] as const).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPosition(p)}
                   className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                     position === p
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                   }`}
                 >
                   {p}
@@ -137,7 +186,9 @@ function WidgetTab({ botId, botName, apiUrl }: { botId: string; botName: string;
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Primary Color</label>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              Primary Color
+            </label>
             <div className="flex items-center gap-3">
               <input
                 type="color"
@@ -145,15 +196,17 @@ function WidgetTab({ botId, botName, apiUrl }: { botId: string; botName: string;
                 onChange={(e) => setPrimaryColor(e.target.value)}
                 className="w-10 h-8 border-none cursor-pointer rounded"
               />
-              <code className="text-sm text-muted-foreground">{primaryColor}</code>
+              <code className="text-sm text-muted-foreground">
+                {primaryColor}
+              </code>
             </div>
           </div>
         </div>
 
         <CodeBlock
           title="Usage"
-          code={`import { VChatProvider, ChatWidget } from '@vchat/react';
-import '@vchat/react/style.css';
+          code={`import { VChatProvider, ChatWidget } from 'vchat7';
+import 'vchat7/style.css';
 
 function App() {
   return (
@@ -191,7 +244,9 @@ function InlineTab({ botName, apiUrl }: { botName: string; apiUrl: string }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2 items-start">
       <div>
-        <div className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-2">Live Preview</div>
+        <div className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-2">
+          Live Preview
+        </div>
         <div className="rounded-xl overflow-hidden border border-border shadow-sm">
           <ChatWindow
             title={botName}
@@ -205,8 +260,8 @@ function InlineTab({ botName, apiUrl }: { botName: string; apiUrl: string }) {
       <div className="space-y-4">
         <CodeBlock
           title="Usage"
-          code={`import { VChatProvider, ChatWindow } from '@vchat/react';
-import '@vchat/react/style.css';
+          code={`import { VChatProvider, ChatWindow } from 'vchat7';
+import 'vchat7/style.css';
 
 function SupportPage() {
   return (
@@ -229,7 +284,9 @@ function SupportPage() {
         />
 
         <div className="bg-card rounded-xl border border-border shadow-sm p-5">
-          <h4 className="text-sm font-semibold text-card-foreground mb-2">When to use ChatWindow</h4>
+          <h4 className="text-sm font-semibold text-card-foreground mb-2">
+            When to use ChatWindow
+          </h4>
           <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-4">
             <li>Dedicated help/support pages</li>
             <li>Side panels in dashboards</li>
@@ -256,7 +313,7 @@ function HeadlessTab() {
 
       <CodeBlock
         title="Usage"
-        code={`import { useVChat, VChatProvider } from '@vchat/react';
+        code={`import { useVChat, VChatProvider } from 'vchat7';
 
 function CustomChat() {
   const {
@@ -307,19 +364,21 @@ function CustomChat() {
 
 function CustomChatUI() {
   const { messages, sendMessage, isLoading, error, reset } = useVChat();
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
 
   const handleSend = () => {
     if (input.trim() && !isLoading) {
       sendMessage(input.trim());
-      setInput('');
+      setInput("");
     }
   };
 
   return (
     <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden flex flex-col h-[480px]">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted">
-        <span className="text-sm font-semibold text-card-foreground">Custom Chat UI</span>
+        <span className="text-sm font-semibold text-card-foreground">
+          Custom Chat UI
+        </span>
         <button
           onClick={reset}
           className="px-3 py-1 text-xs border border-input rounded-md text-muted-foreground hover:text-foreground bg-card transition-colors"
@@ -331,21 +390,33 @@ function CustomChatUI() {
       <div className="flex-1 overflow-auto p-4 flex flex-col">
         {messages.length === 0 && (
           <p className="text-muted-foreground text-center m-auto text-sm">
-            This chat uses the headless <code className="px-1 py-0.5 bg-secondary rounded text-xs font-mono">useVChat()</code> hook with a fully custom UI.
+            This chat uses the headless{" "}
+            <code className="px-1 py-0.5 bg-secondary rounded text-xs font-mono">
+              useVChat()
+            </code>{" "}
+            hook with a fully custom UI.
           </p>
         )}
         {messages.map((msg: ChatMessage) => (
           <div key={msg.id} className="mb-3">
-            <div className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${
-              msg.role === 'user' ? 'text-primary' : 'text-green-600 dark:text-green-400'
-            }`}>
-              {msg.role === 'user' ? 'You' : 'Assistant'}
+            <div
+              className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${
+                msg.role === "user"
+                  ? "text-primary"
+                  : "text-green-600 dark:text-green-400"
+              }`}
+            >
+              {msg.role === "user" ? "You" : "Assistant"}
             </div>
-            <div className={`text-sm leading-relaxed whitespace-pre-wrap rounded-lg px-3.5 py-2.5 ${
-              msg.role === 'user' ? 'bg-secondary text-secondary-foreground' : 'bg-accent text-accent-foreground'
-            }`}>
+            <div
+              className={`text-sm leading-relaxed whitespace-pre-wrap rounded-lg px-3.5 py-2.5 ${
+                msg.role === "user"
+                  ? "bg-secondary text-secondary-foreground"
+                  : "bg-accent text-accent-foreground"
+              }`}
+            >
               {msg.content}
-              {isLoading && msg.role === 'assistant' && msg.content === '' && (
+              {isLoading && msg.role === "assistant" && msg.content === "" && (
                 <span className="text-muted-foreground">Thinking...</span>
               )}
             </div>
@@ -362,7 +433,7 @@ function CustomChatUI() {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="Type something..."
           disabled={isLoading}
           className="flex-1 px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"

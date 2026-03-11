@@ -47,12 +47,12 @@ npm run dev    # Opens at http://localhost:5173
 ### 3. Use the SDK in your React app
 
 ```bash
-npm install @vchat/react
+npm install vchat7
 ```
 
 ```tsx
-import { VChatProvider, ChatWidget } from '@vchat/react';
-import '@vchat/react/style.css';
+import { VChatProvider, ChatWidget } from "@vchat/react";
+import "@vchat/react/style.css";
 
 function App() {
   return (
@@ -60,7 +60,7 @@ function App() {
       <ChatWidget
         position="bottom-right"
         welcomeMessage="Hi! How can I help?"
-        theme={{ primaryColor: '#6366f1' }}
+        theme={{ primaryColor: "#6366f1" }}
       />
     </VChatProvider>
   );
@@ -76,6 +76,7 @@ npm run dev    # Opens at http://localhost:5174
 ```
 
 The demo app has three tabs showcasing each SDK integration mode:
+
 - **ChatWidget** — Floating bubble with live customization (position, color)
 - **ChatWindow** — Inline chat embedded in the page
 - **useVChat** — Headless hook with a fully custom UI
@@ -91,11 +92,11 @@ docker compose up
 
 ## LLM Providers
 
-| Provider | Setup | Models |
-|----------|-------|--------|
-| Ollama (local) | Install Ollama, pull model | llama3.2:3b, phi3.5, gemma2:2b |
-| Groq (cloud) | Set `GROQ_API_KEY` | llama-3.2-3b-preview, mixtral-8x7b |
-| Together AI (cloud) | Set `TOGETHER_API_KEY` | Llama-3.2-3B-Instruct-Turbo |
+| Provider            | Setup                      | Models                             |
+| ------------------- | -------------------------- | ---------------------------------- |
+| Ollama (local)      | Install Ollama, pull model | llama3.2:3b, phi3.5, gemma2:2b     |
+| Groq (cloud)        | Set `GROQ_API_KEY`         | llama-3.2-3b-preview, mixtral-8x7b |
+| Together AI (cloud) | Set `TOGETHER_API_KEY`     | Llama-3.2-3B-Instruct-Turbo        |
 
 ## SDK Components
 
