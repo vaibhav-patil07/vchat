@@ -3,6 +3,10 @@
   --vchat-bg: #ffffff;
   --vchat-chat-bg: var(--vchat-bg);
   --vchat-text: #1f2937;
+  --vchat-user-bubble: var(--vchat-primary);
+  --vchat-user-bubble-text: #ffffff;
+  --vchat-ai-bubble: #f3f4f6;
+  --vchat-ai-bubble-text: var(--vchat-text);
   --vchat-radius: 12px;
   --vchat-header-bg: var(--vchat-primary);
   --vchat-header-text: #ffffff;
@@ -200,14 +204,14 @@
 }
 
 .vchat-msg.user .vchat-msg-bubble {
-  background: var(--vchat-primary);
-  color: white;
+  background: var(--vchat-user-bubble);
+  color: var(--vchat-user-bubble-text);
   border-bottom-right-radius: 4px;
 }
 
 .vchat-msg.assistant .vchat-msg-bubble {
-  background: #f3f4f6;
-  color: var(--vchat-text);
+  background: var(--vchat-ai-bubble);
+  color: var(--vchat-ai-bubble-text);
   border-bottom-left-radius: 4px;
 }
 

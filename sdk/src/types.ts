@@ -8,6 +8,10 @@ export interface VChatTheme {
   backgroundColor?: string;
   chatBackground?: string;
   textColor?: string;
+  userBubbleColor?: string;
+  userBubbleTextColor?: string;
+  aiBubbleColor?: string;
+  aiBubbleTextColor?: string;
   fontFamily?: string;
   borderRadius?: number;
   headerBackground?: string;

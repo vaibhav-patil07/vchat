@@ -113,6 +113,10 @@ Pass a `VChatTheme` object to `<VChatProvider>` or individual components:
     backgroundColor: '#ffffff',
     chatBackground: '#f8fafc',
     textColor: '#1f2937',
+    userBubbleColor: '#6366f1',
+    userBubbleTextColor: '#ffffff',
+    aiBubbleColor: '#f3f4f6',
+    aiBubbleTextColor: '#1f2937',
     fontFamily: 'Inter, sans-serif',
     borderRadius: 12,
     headerBackground: '#6366f1',
@@ -125,10 +129,14 @@ Pass a `VChatTheme` object to `<VChatProvider>` or individual components:
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `primaryColor` | `string` | `'#6366f1'` | Accent color for buttons, send button, user message bubbles |
+| `primaryColor` | `string` | `'#6366f1'` | Accent color for buttons, send button, trigger bubble |
 | `backgroundColor` | `string` | `'#ffffff'` | Outer panel/window background |
 | `chatBackground` | `string` | Inherits `backgroundColor` | Messages area and input background |
-| `textColor` | `string` | `'#1f2937'` | Main text color |
+| `textColor` | `string` | `'#1f2937'` | Assistant message text color |
+| `userBubbleColor` | `string` | Same as `primaryColor` | User message bubble background |
+| `userBubbleTextColor` | `string` | `'#ffffff'` | User message bubble text color |
+| `aiBubbleColor` | `string` | `'#f3f4f6'` | AI message bubble background |
+| `aiBubbleTextColor` | `string` | Same as `textColor` | AI message bubble text color |
 | `fontFamily` | `string` | `system-ui, sans-serif` | Font family |
 | `borderRadius` | `number` | `12` | Border radius in pixels |
 | `headerBackground` | `string` | Same as `primaryColor` | Chat header background |
@@ -145,6 +153,10 @@ Pass a `VChatTheme` object to `<VChatProvider>` or individual components:
     backgroundColor: '#1e293b',
     chatBackground: '#0f172a',
     textColor: '#f1f5f9',
+    userBubbleColor: '#818cf8',
+    userBubbleTextColor: '#ffffff',
+    aiBubbleColor: '#1e293b',
+    aiBubbleTextColor: '#f1f5f9',
     headerBackground: '#334155',
     headerTextColor: '#f1f5f9',
   }}
