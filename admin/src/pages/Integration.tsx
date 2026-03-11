@@ -150,6 +150,10 @@ function WidgetTab({
   );
   const [primaryColor, setPrimaryColor] = useState("#6366f1");
   const [chatBackground, setChatBackground] = useState("#ffffff");
+  const [userBubbleColor, setUserBubbleColor] = useState("#6366f1");
+  const [userBubbleTextColor, setUserBubbleTextColor] = useState("#ffffff");
+  const [aiBubbleColor, setAiBubbleColor] = useState("#f3f4f6");
+  const [aiBubbleTextColor, setAiBubbleTextColor] = useState("#1f2937");
 
   return (
     <div>
@@ -219,6 +223,74 @@ function WidgetTab({
               </code>
             </div>
           </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              User Bubble Color
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={userBubbleColor}
+                onChange={(e) => setUserBubbleColor(e.target.value)}
+                className="w-10 h-8 border-none cursor-pointer rounded"
+              />
+              <code className="text-sm text-muted-foreground">
+                {userBubbleColor}
+              </code>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              User Bubble Text
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={userBubbleTextColor}
+                onChange={(e) => setUserBubbleTextColor(e.target.value)}
+                className="w-10 h-8 border-none cursor-pointer rounded"
+              />
+              <code className="text-sm text-muted-foreground">
+                {userBubbleTextColor}
+              </code>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              AI Bubble Color
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={aiBubbleColor}
+                onChange={(e) => setAiBubbleColor(e.target.value)}
+                className="w-10 h-8 border-none cursor-pointer rounded"
+              />
+              <code className="text-sm text-muted-foreground">
+                {aiBubbleColor}
+              </code>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              AI Bubble Text
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={aiBubbleTextColor}
+                onChange={(e) => setAiBubbleTextColor(e.target.value)}
+                className="w-10 h-8 border-none cursor-pointer rounded"
+              />
+              <code className="text-sm text-muted-foreground">
+                {aiBubbleTextColor}
+              </code>
+            </div>
+          </div>
         </div>
 
         <CodeBlock
@@ -237,6 +309,10 @@ function App() {
         theme={{
           primaryColor: "${primaryColor}",
           chatBackground: "${chatBackground}",
+          userBubbleColor: "${userBubbleColor}",
+          userBubbleTextColor: "${userBubbleTextColor}",
+          aiBubbleColor: "${aiBubbleColor}",
+          aiBubbleTextColor: "${aiBubbleTextColor}",
         }}
         welcomeMessage="Hi! How can I help?"
         placeholder="Type a message..."
@@ -250,7 +326,7 @@ function App() {
 
       <ChatWidget
         position={position}
-        theme={{ primaryColor, chatBackground }}
+        theme={{ primaryColor, chatBackground, userBubbleColor, userBubbleTextColor, aiBubbleColor, aiBubbleTextColor }}
         welcomeMessage={`Hi! I'm ${botName}. Ask me anything.`}
         placeholder="Type a message..."
         title={botName}
@@ -289,6 +365,14 @@ function SupportPage() {
     <VChatProvider
       apiUrl="${apiUrl}"
       botId="your-bot-id"
+      theme={{
+        primaryColor: '#6366f1',
+        chatBackground: '#ffffff',
+        userBubbleColor: '#6366f1',
+        userBubbleTextColor: '#ffffff',
+        aiBubbleColor: '#f3f4f6',
+        aiBubbleTextColor: '#1f2937',
+      }}
     >
       <div className="page-layout">
         <h1>Help Center</h1>
@@ -335,6 +419,7 @@ function HeadlessTab() {
       <CodeBlock
         title="Usage"
         code={`import { useVChat, VChatProvider } from 'vchat7';
+import 'vchat7/style.css';
 
 function CustomChat() {
   const {
