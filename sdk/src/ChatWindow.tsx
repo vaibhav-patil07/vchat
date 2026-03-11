@@ -38,6 +38,7 @@ export function ChatWindow({
   const cssVars = {
     '--vchat-primary': theme.primaryColor,
     '--vchat-bg': theme.backgroundColor,
+    '--vchat-chat-bg': theme.chatBackground,
     '--vchat-text': theme.textColor,
     '--vchat-radius': theme.borderRadius ? `${theme.borderRadius}px` : undefined,
     '--vchat-header-bg': theme.headerBackground,
@@ -59,20 +60,15 @@ export function ChatWindow({
             <div className="vchat-msg-avatar">
               {msg.role === 'user' ? 'U' : 'AI'}
             </div>
-            <div
-              className="vchat-msg-bubble"
-              dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content) }}
-            />
-          </div>
-        ))}
-        {isLoading && messages[messages.length - 1]?.content === '' && (
-          <div className="vchat-msg assistant">
-            <div className="vchat-msg-avatar">AI</div>
             <div className="vchat-msg-bubble">
-              <span className="vchat-typing" />
+              {isLoading && msg.role === 'assistant' && msg.content === '' ? (
+                <span className="vchat-typing" />
+              ) : (
+                <span dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content) }} />
+              )}
             </div>
           </div>
-        )}
+        ))}
         <div ref={messagesEndRef} />
       </div>
       <form className="vchat-input-area" onSubmit={handleSubmit}>

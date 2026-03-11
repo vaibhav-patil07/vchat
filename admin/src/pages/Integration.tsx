@@ -149,6 +149,7 @@ function WidgetTab({
     "bottom-right",
   );
   const [primaryColor, setPrimaryColor] = useState("#6366f1");
+  const [chatBackground, setChatBackground] = useState("#ffffff");
 
   return (
     <div>
@@ -201,6 +202,23 @@ function WidgetTab({
               </code>
             </div>
           </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              Chat Background
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={chatBackground}
+                onChange={(e) => setChatBackground(e.target.value)}
+                className="w-10 h-8 border-none cursor-pointer rounded"
+              />
+              <code className="text-sm text-muted-foreground">
+                {chatBackground}
+              </code>
+            </div>
+          </div>
         </div>
 
         <CodeBlock
@@ -216,7 +234,10 @@ function App() {
     >
       <ChatWidget
         position="${position}"
-        theme={{ primaryColor: "${primaryColor}" }}
+        theme={{
+          primaryColor: "${primaryColor}",
+          chatBackground: "${chatBackground}",
+        }}
         welcomeMessage="Hi! How can I help?"
         placeholder="Type a message..."
       />
@@ -229,7 +250,7 @@ function App() {
 
       <ChatWidget
         position={position}
-        theme={{ primaryColor }}
+        theme={{ primaryColor, chatBackground }}
         welcomeMessage={`Hi! I'm ${botName}. Ask me anything.`}
         placeholder="Type a message..."
         title={botName}

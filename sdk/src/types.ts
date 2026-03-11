@@ -6,6 +6,7 @@ export interface VChatConfig {
 export interface VChatTheme {
   primaryColor?: string;
   backgroundColor?: string;
+  chatBackground?: string;
   textColor?: string;
   fontFamily?: string;
   borderRadius?: number;
