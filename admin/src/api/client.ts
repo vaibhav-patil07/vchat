@@ -101,6 +101,11 @@ export interface AllowedUser {
 }
 
 export const api = {
+  requestAccess: (email: string, description: string) =>
+    request<{ message: string }>('/auth/request-access', {
+      method: 'POST',
+      body: JSON.stringify({ email, description }),
+    }),
   bots: {
     list: (owner?: string) =>
       request<Bot[]>(owner ? `/bots?owner=${encodeURIComponent(owner)}` : '/bots'),

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
-import { MessageSquare, ShieldAlert, Users } from 'lucide-react';
+import { MessageSquare, ShieldAlert, Users, Send, X, CheckCircle2 } from 'lucide-react';
 import { useAuth, type Role } from '../auth/AuthContext';
+import { api } from '../api/client';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL || ''}/api`;
 
@@ -9,6 +10,7 @@ export function Login() {
   const { login } = useAuth();
   const [error, setError] = useState('');
   const [verifying, setVerifying] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   const handleGoogleSuccess = async (response: CredentialResponse) => {
     if (!response.credential) {
@@ -122,9 +124,155 @@ export function Login() {
               <p className="text-xs text-muted-foreground text-center">
                 Guests can create up to 3 bots to try things out.
               </p>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-card px-3 text-muted-foreground">need access?</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowRequestModal(true)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+              >
+                <Send className="w-4 h-4" />
+                Raise Request for Access
+              </button>
             </div>
           )}
         </div>
+      </div>
+
+      {showRequestModal && (
+        <RequestAccessModal onClose={() => setShowRequestModal(false)} />
+      )}
+    </div>
+  );
+}
+
+function RequestAccessModal({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState('');
+  const [description, setDescription] = useState('');
+  const [sending, setSending] = useState(false);
+  const [modalError, setModalError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setSending(true);
+    setModalError('');
+
+    try {
+      await api.requestAccess(email, description);
+      setSuccess(true);
+    } catch (err) {
+      setModalError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div
+      ref={overlayRef}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
+    >
+      <div className="w-full max-w-md bg-card rounded-2xl shadow-xl border border-border p-6 mx-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-card-foreground">Request Access</h2>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {success ? (
+          <div className="flex flex-col items-center gap-3 py-6">
+            <CheckCircle2 className="w-12 h-12 text-green-500" />
+            <p className="text-sm text-card-foreground font-medium">Request sent successfully!</p>
+            <p className="text-xs text-muted-foreground text-center">
+              The admin will review your request and get back to you.
+            </p>
+            <button
+              onClick={onClose}
+              className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              Done
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {modalError && (
+              <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive">
+                <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{modalError}</span>
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="req-email" className="block text-sm font-medium text-card-foreground mb-1.5">
+                Email
+              </label>
+              <input
+                id="req-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="req-desc" className="block text-sm font-medium text-card-foreground mb-1.5">
+                Why do you need access?
+              </label>
+              <textarea
+                id="req-desc"
+                required
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Briefly describe your use case..."
+                className="w-full px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={sending}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {sending ? (
+                <>
+                  <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  Send Request
+                </>
+              )}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

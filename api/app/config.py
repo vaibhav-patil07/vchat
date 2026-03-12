@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-in-production"
     guest_bot_limit: int = 3
 
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = ""
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
 

@@ -117,12 +117,6 @@ export function Landing() {
               Get Started
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-secondary-foreground bg-secondary rounded-xl hover:bg-secondary/80 transition-colors"
-            >
-              Learn More
-            </Link>
           </div>
         </div>
       </section>
