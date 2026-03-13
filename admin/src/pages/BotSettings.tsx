@@ -5,9 +5,9 @@ import { ArrowLeft, Save, Check } from 'lucide-react';
 import { api, type BotUpdate } from '../api/client';
 
 const PROVIDERS = [
-  { value: 'ollama', label: 'Ollama (Local)', models: ['llama3.2:3b', 'llama3.2:1b', 'phi3.5', 'gemma2:2b', 'mistral'] },
-  { value: 'groq', label: 'Groq (Cloud)', models: ['llama-3.1-8b-instant', 'llama-3.3-70b-versatile', 'meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3-32b'] },
-  { value: 'together', label: 'Together AI (Cloud)', models: ['meta-llama/Llama-3.2-3B-Instruct-Turbo', 'Qwen/Qwen2.5-7B-Instruct-Turbo'] },
+  { value: 'ollama', label: 'Ollama (Local)', models: ['llama3.2:3b', 'llama3.2:1b', 'phi3.5', 'gemma2:2b', 'mistral'], upcoming: true },
+  { value: 'groq', label: 'Groq (Cloud)', models: ['llama-3.1-8b-instant', 'llama-3.3-70b-versatile', 'meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3-32b'], upcoming: false },
+  { value: 'together', label: 'Together AI (Cloud)', models: ['meta-llama/Llama-3.2-3B-Instruct-Turbo', 'Qwen/Qwen2.5-7B-Instruct-Turbo'], upcoming: true },
 ];
 
 export function BotSettings() {
@@ -98,18 +98,35 @@ export function BotSettings() {
 
           <div>
             <label className="block text-sm font-medium text-card-foreground mb-1">Provider</label>
-            <select
-              value={form.provider || 'ollama'}
-              onChange={(e) => {
-                const p = PROVIDERS.find(p => p.value === e.target.value);
-                setForm(f => ({ ...f, provider: e.target.value, model_name: p?.models[0] }));
-              }}
-              className="w-full px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {PROVIDERS.map(p => (
-                <option key={p.value} value={p.value}>{p.label}</option>
-              ))}
-            </select>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {PROVIDERS.map(p => {
+                const isSelected = (form.provider || 'groq') === p.value;
+                return (
+                  <button
+                    key={p.value}
+                    type="button"
+                    disabled={p.upcoming}
+                    onClick={() => {
+                      if (!p.upcoming) setForm(f => ({ ...f, provider: p.value, model_name: p.models[0] }));
+                    }}
+                    className={`relative px-4 py-3 rounded-lg border text-sm font-medium text-left transition-colors ${
+                      p.upcoming
+                        ? 'border-border bg-muted text-muted-foreground cursor-not-allowed opacity-60'
+                        : isSelected
+                          ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary'
+                          : 'border-input bg-background text-foreground hover:bg-secondary/50'
+                    }`}
+                  >
+                    {p.label}
+                    {p.upcoming && (
+                      <span className="absolute top-1.5 right-1.5 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                        Upcoming
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div>

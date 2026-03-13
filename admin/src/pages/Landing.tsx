@@ -179,14 +179,19 @@ export function Landing() {
         </div>
         <div className="grid gap-6 sm:grid-cols-3">
           {[
-            { name: 'Ollama', desc: 'Run models locally on your own hardware. Full privacy, zero API costs.', tag: 'Local' },
-            { name: 'Groq', desc: 'Ultra-fast inference with LPU technology. Lightning-quick responses at scale.', tag: 'Cloud' },
-            { name: 'Together AI', desc: 'Access a wide catalog of models via a simple API.', tag: 'Cloud' },
+            { name: 'Ollama', desc: 'Run models locally on your own hardware. Full privacy, zero API costs.', tag: 'Local', upcoming: true },
+            { name: 'Groq', desc: 'Ultra-fast inference with LPU technology. Lightning-quick responses at scale.', tag: 'Cloud', upcoming: false },
+            { name: 'Together AI', desc: 'Access a wide catalog of models via a simple API.', tag: 'Cloud', upcoming: true },
           ].map((p) => (
-            <div key={p.name} className="bg-card rounded-xl border border-border p-6 text-center">
+            <div key={p.name} className={`relative bg-card rounded-xl border border-border p-6 text-center ${p.upcoming ? 'opacity-60' : ''}`}>
               <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary mb-3">
                 {p.tag}
               </span>
+              {p.upcoming && (
+                <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                  Upcoming
+                </span>
+              )}
               <h3 className="font-semibold text-card-foreground mb-2">{p.name}</h3>
               <p className="text-sm text-muted-foreground">{p.desc}</p>
             </div>
