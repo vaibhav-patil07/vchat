@@ -11,6 +11,7 @@ import { KnowledgeBase } from './pages/KnowledgeBase';
 import { TestChat } from './pages/TestChat';
 import { Users } from './pages/Users';
 import { Integration } from './pages/Integration';
+import { ChatHistory } from './pages/ChatHistory';
 import { Login } from './pages/Login';
 
 const queryClient = new QueryClient({
@@ -40,6 +41,7 @@ function AppRoutes() {
         <Route path="/bots/:id/settings" element={<BotSettings />} />
         <Route path="/bots/:id/knowledge" element={<KnowledgeBase />} />
         <Route path="/bots/:id/chat" element={<TestChat />} />
+        <Route path="/bots/:id/history" element={<ChatHistory />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

@@ -19,13 +19,14 @@ export function Layout() {
   const navLink = (to: string, label: string, Icon: typeof Bot, match: (p: string) => boolean) => (
     <Link
       to={to}
+      title={label}
       className={`text-sm font-medium transition-colors ${
         match(location.pathname) ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
       }`}
     >
       <span className="flex items-center gap-1.5">
         <Icon className="w-4 h-4" />
-        {label}
+        <span className="hidden sm:inline">{label}</span>
       </span>
     </Link>
   );
@@ -39,7 +40,7 @@ export function Layout() {
               <MessageSquare className="w-6 h-6" />
               VChat
             </Link>
-            <nav className="flex items-center gap-6">
+            <nav className="flex items-center gap-3 sm:gap-6">
               {navLink('/', 'Bots', Bot, (p) => p === '/' || p.startsWith('/bots'))}
               {navLink('/integration', 'SDK', Code2, (p) => p === '/integration')}
               {user?.role === 'admin' && navLink('/users', 'Users', Users, (p) => p === '/users')}
@@ -51,7 +52,7 @@ export function Layout() {
                 <ThemeIcon className="w-4 h-4" />
               </button>
               {user && (
-                <div className="flex items-center gap-3 pl-4 border-l border-border">
+                <div className="flex items-center gap-2 sm:gap-3 pl-3 sm:pl-4 border-l border-border">
                   {user.picture ? (
                     <img src={user.picture} alt="" className="w-7 h-7 rounded-full" referrerPolicy="no-referrer" />
                   ) : (

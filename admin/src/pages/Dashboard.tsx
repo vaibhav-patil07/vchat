@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Plus, Settings, BookOpen, MessageSquare, Trash2, Filter } from 'lucide-react';
+import { Plus, Settings, BookOpen, MessageSquare, Trash2, Filter, History } from 'lucide-react';
 import { api, type Bot } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 
@@ -165,28 +165,41 @@ export function Dashboard() {
               <span className="flex items-center gap-1"><BookOpen className="w-3.5 h-3.5" />{bot.document_count} docs</span>
               <span className="flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" />{bot.conversation_count} chats</span>
             </div>
-            <div className="flex gap-2">
-              <Link
-                to={`/bots/${bot.id}/settings`}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
-              >
-                <Settings className="w-3.5 h-3.5" />
-                Settings
-              </Link>
-              <Link
-                to={`/bots/${bot.id}/knowledge`}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
-              >
-                <BookOpen className="w-3.5 h-3.5" />
-                Knowledge
-              </Link>
-              <Link
-                to={`/bots/${bot.id}/chat`}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors"
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                Chat
-              </Link>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <Link
+                  to={`/bots/${bot.id}/settings`}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                  Settings
+                </Link>
+                <Link
+                  to={`/bots/${bot.id}/knowledge`}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  Knowledge
+                </Link>
+              </div>
+              <div className="flex gap-2">
+                <Link
+                  to={`/bots/${bot.id}/chat`}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  Chat
+                </Link>
+                {isAdmin && (
+                  <Link
+                    to={`/bots/${bot.id}/history`}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
+                  >
+                    <History className="w-3.5 h-3.5" />
+                    History
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         ))}
