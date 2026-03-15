@@ -14,6 +14,7 @@ export function ChatHistory() {
   const { id: botId } = useParams<{ id: string }>();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [expandedContext, setExpandedContext] = useState<string | null>(null);
+  const [mobileShowMessages, setMobileShowMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { data: bot } = useQuery({
@@ -44,6 +45,11 @@ export function ChatHistory() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [detail]);
 
+  const handleSelectConversation = (id: string) => {
+    setSelectedId(id);
+    setMobileShowMessages(true);
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <div className="flex items-center gap-4 mb-4">
@@ -51,14 +57,14 @@ export function ChatHistory() {
           <ArrowLeft className="w-4 h-4" />
           Back
         </Link>
-        <h1 className="text-lg font-bold text-foreground">
+        <h1 className="text-lg font-bold text-foreground truncate">
           Chat History &mdash; {bot?.name}
         </h1>
       </div>
 
       <div className="flex-1 flex gap-4 min-h-0">
-        {/* Conversation list */}
-        <div className="w-72 shrink-0 bg-card rounded-xl border border-border shadow-sm flex flex-col">
+        {/* Conversation list -- full width on mobile, fixed sidebar on md+ */}
+        <div className={`${mobileShowMessages ? 'hidden' : 'flex'} md:flex w-full md:w-72 md:shrink-0 bg-card rounded-xl border border-border shadow-sm flex-col`}>
           <div className="px-4 py-3 border-b border-border">
             <h2 className="text-sm font-semibold text-card-foreground">
               Conversations
@@ -84,7 +90,7 @@ export function ChatHistory() {
             {conversations?.map((conv: Conversation) => (
               <button
                 key={conv.id}
-                onClick={() => setSelectedId(conv.id)}
+                onClick={() => handleSelectConversation(conv.id)}
                 className={`w-full text-left px-4 py-3 border-b border-border/50 transition-colors ${
                   selectedId === conv.id
                     ? 'bg-primary/10'
@@ -109,8 +115,8 @@ export function ChatHistory() {
           </div>
         </div>
 
-        {/* Message viewer */}
-        <div className="flex-1 bg-card rounded-xl border border-border shadow-sm flex flex-col min-w-0">
+        {/* Message viewer -- full width on mobile, flex-1 on md+ */}
+        <div className={`${mobileShowMessages ? 'flex' : 'hidden'} md:flex flex-1 bg-card rounded-xl border border-border shadow-sm flex-col min-w-0`}>
           {!selectedId && (
             <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
               Select a conversation to view
@@ -123,9 +129,15 @@ export function ChatHistory() {
           )}
           {selectedId && !loadingDetail && detail && (
             <>
-              <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-                <div>
-                  <h2 className="text-sm font-semibold text-card-foreground">{detail.title}</h2>
+              <div className="px-4 py-3 border-b border-border flex items-center gap-3">
+                <button
+                  onClick={() => setMobileShowMessages(false)}
+                  className="md:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-semibold text-card-foreground truncate">{detail.title}</h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {formatDate(detail.created_at)} &middot; {detail.messages.length} messages
                   </p>
