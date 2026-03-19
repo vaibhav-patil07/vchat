@@ -89,8 +89,8 @@ export function BotSettings() {
         model_name: bot.model_name,
         temperature: bot.temperature,
         max_tokens: bot.max_tokens,
-        mcp_servers: bot.mcp_servers,
-        tool_config: bot.tool_config,
+        mcp_servers: bot.mcp_servers || undefined,
+        tool_config: bot.tool_config || undefined,
       };
 
       const newMcpServers = bot.mcp_servers || [];
