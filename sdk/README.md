@@ -1,6 +1,6 @@
 # vchat7
 
-Embeddable AI chatbot widget for React applications with streaming support.
+Embeddable AI chatbot widget for React applications with streaming support and MCP tool calling.
 
 ## Installation
 
@@ -35,11 +35,13 @@ function App() {
 
 Wraps your app and provides the API connection context.
 
-| Prop     | Type         | Required | Description                |
-| -------- | ------------ | -------- | -------------------------- |
-| `apiUrl` | `string`     | Yes      | Base URL of your VChat API |
-| `botId`  | `string`     | Yes      | Bot ID to connect to       |
-| `theme`  | `VChatTheme` | No       | Global theme overrides     |
+| Prop         | Type         | Required | Description                                    |
+| ------------ | ------------ | -------- | ---------------------------------------------- |
+| `apiUrl`     | `string`     | Yes      | Base URL of your VChat API                     |
+| `botId`      | `string`     | Yes      | Bot ID to connect to                           |
+| `showTools`  | `boolean`    | No       | Enable tool pills display (default: false)    |
+| `toolConfig` | `ToolConfig` | No       | Tool configuration overrides                   |
+| `theme`      | `VChatTheme` | No       | Global theme overrides                         |
 
 ### `<ChatWidget>`
 
@@ -52,6 +54,7 @@ Floating chat bubble with expand/collapse panel. Drop it anywhere in your app.
 | `placeholder`    | `string`                          | `'Type a message...'`          | Input placeholder                            |
 | `welcomeMessage` | `string`                          | `'Hello! How can I help you?'` | Initial greeting                             |
 | `title`          | `string`                          | `'Chat'`                       | Header title                                 |
+| `onToolClick`    | `(name, desc) => void`            | —                              | Custom tool click handler                    |
 
 ### `<ChatWindow>`
 
@@ -64,6 +67,7 @@ Inline chat panel for embedding directly in your page layout.
 | `placeholder`    | `string`        | `'Type a message...'`          | Input placeholder    |
 | `welcomeMessage` | `string`        | `'Hello! How can I help you?'` | Initial greeting     |
 | `title`          | `string`        | `'Chat'`                       | Header title         |
+| `onToolClick`    | `(name, desc) => void` | —                       | Custom tool click handler |
 
 ### `useVChat()` Hook
 
@@ -100,6 +104,123 @@ function CustomChat() {
 | `error`          | `string \| null`                  | Last error message                                  |
 | `conversationId` | `string \| null`                  | Current conversation ID (persisted in localStorage) |
 | `reset`          | `() => void`                      | Clear messages and start over                       |
+
+## Tool Calling Support
+
+VChat7 supports MCP (Model Context Protocol) tool calling, allowing your bots to interact with external tools and services.
+
+### Enabling Tool Pills
+
+To show clickable tool buttons in the chat interface:
+
+```tsx
+<VChatProvider
+  apiUrl="https://your-api.example.com"
+  botId="your-bot-id"
+  showTools={true}
+>
+  <ChatWidget />
+</VChatProvider>
+```
+
+### Tool Configuration
+
+You can customize how tools appear and behave:
+
+```tsx
+<VChatProvider
+  apiUrl="https://your-api.example.com"
+  botId="your-bot-id"
+  showTools={true}
+  toolConfig={{
+    enabled: true,
+    displayNames: {
+      "send_email": "Send Email",
+      "get_weather": "Check Weather"
+    },
+    hiddenTools: ["internal_tool"],
+    customOrder: ["send_email", "get_weather"]
+  }}
+>
+  <ChatWidget />
+</VChatProvider>
+```
+
+### `<ToolPills>` Component
+
+Display tool buttons separately from chat components:
+
+```tsx
+import { VChatProvider, ToolPills, useTools } from "vchat7";
+
+function MyToolbar() {
+  const handleToolClick = (toolName: string, description: string) => {
+    console.log(`User clicked tool: ${toolName}`);
+    // Custom handling logic
+  };
+
+  return (
+    <VChatProvider apiUrl="..." botId="..." showTools={true}>
+      <ToolPills onToolClick={handleToolClick} />
+    </VChatProvider>
+  );
+}
+```
+
+### `useTools()` Hook
+
+Access tool data programmatically:
+
+```tsx
+import { useTools, VChatProvider } from "vchat7";
+
+function CustomToolInterface() {
+  const { tools, isLoading, error } = useTools();
+
+  if (isLoading) return <div>Loading tools...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div>
+      <h3>Available Tools:</h3>
+      {tools.map(tool => (
+        <button key={tool.name} onClick={() => handleTool(tool)}>
+          {tool.displayName || tool.name}
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+### Tool Configuration Types
+
+```tsx
+interface ToolConfig {
+  enabled: boolean;
+  displayNames?: Record<string, string>; // tool_name -> display_name
+  hiddenTools?: string[]; // tools to hide from UI
+  customOrder?: string[]; // custom ordering of tools
+}
+
+interface Tool {
+  name: string;
+  description: string;
+  displayName?: string;
+  parameters?: any; // JSON schema for tool parameters
+  server_url?: string;
+}
+```
+
+### How Tool Calling Works
+
+1. **Bot Configuration**: Bot owners configure MCP servers in the admin panel
+2. **Tool Discovery**: Available tools are automatically discovered from MCP servers
+3. **Tool Pills**: When `showTools={true}`, clickable tool buttons appear in the chat
+4. **Natural Execution**: Clicking a tool sends a natural language request to the bot
+5. **Parameter Collection**: If tools need parameters, the AI asks for them conversationally
+6. **Automatic Execution**: Once parameters are provided, tools execute automatically
+7. **Result Display**: Tool results are presented naturally in the conversation
 
 ## Theming
 

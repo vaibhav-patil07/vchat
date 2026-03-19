@@ -1,13 +1,13 @@
 {
   "name": "vchat7",
-  "version": "1.3.0",
-  "description": "Embeddable AI chatbot widget for React applications",
+  "version": "1.4.0",
+  "description": "Embeddable AI chatbot widget for React applications with MCP tool calling support",
   "author": "Vaibhav Patil",
   "license": "MIT",
   "homepage": "https://github.com/vaibhav-patil/vchat#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vaibhav-patil/vchat.git",
+    "url": "git+https://github.com/vaibhav-patil/vchat.git",
     "directory": "sdk"
   },
   "bugs": {
@@ -22,7 +22,10 @@
     "embeddable",
     "streaming",
     "sse",
-    "conversational-ai"
+    "conversational-ai",
+    "mcp",
+    "tool-calling",
+    "model-context-protocol"
   ],
   "type": "module",
   "main": "dist/vchat7-react.umd.js",
