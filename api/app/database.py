@@ -29,6 +29,9 @@ async def init_db():
         for migration in [
             "ALTER TABLE bots ADD COLUMN created_by VARCHAR(50) DEFAULT 'admin'",
             "ALTER TABLE allowed_users ADD COLUMN bot_limit INTEGER DEFAULT 5",
+            "ALTER TABLE bots ADD COLUMN mcp_servers TEXT",
+            "ALTER TABLE bots ADD COLUMN mcp_token VARCHAR(64)",
+            "ALTER TABLE bots ADD COLUMN tool_config TEXT",
         ]:
             try:
                 await conn.execute(text(migration))

@@ -106,7 +106,7 @@ export function Integration() {
 
       {/* Tab content */}
       {selectedBotId ? (
-        <VChatProvider apiUrl={apiUrl} botId={selectedBotId}>
+        <VChatProvider apiUrl={apiUrl} botId={selectedBotId} showTools={true}>
           {tab === "widget" && (
             <WidgetTab
               botId={selectedBotId}
@@ -326,7 +326,14 @@ function App() {
 
       <ChatWidget
         position={position}
-        theme={{ primaryColor, chatBackground, userBubbleColor, userBubbleTextColor, aiBubbleColor, aiBubbleTextColor }}
+        theme={{
+          primaryColor,
+          chatBackground,
+          userBubbleColor,
+          userBubbleTextColor,
+          aiBubbleColor,
+          aiBubbleTextColor,
+        }}
         welcomeMessage={`Hi! I'm ${botName}. Ask me anything.`}
         placeholder="Type a message..."
         title={botName}

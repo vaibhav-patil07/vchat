@@ -15,6 +15,9 @@ class Bot(Base):
     model_name: Mapped[str] = mapped_column(String(255), default="llama3.2:3b")
     temperature: Mapped[float] = mapped_column(Float, default=0.7)
     max_tokens: Mapped[int] = mapped_column(Integer, default=1024)
+    mcp_servers: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
+    mcp_token: Mapped[str | None] = mapped_column(String(64), nullable=True, default=lambda: str(uuid.uuid4()))
+    tool_config: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
     created_by: Mapped[str] = mapped_column(String(50), default="admin", server_default="admin")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

@@ -6,7 +6,7 @@ from app.database import get_db
 from app.models.bot import Bot
 from app.models.conversation import Conversation, Message
 from app.schemas.chat import ChatRequest
-from app.services.llm_provider import chat_completion_stream
+from app.services.llm_provider import chat_completion_stream, chat_completion_stream_with_tools
 from app.services.rag import retrieve_context
 
 router = APIRouter(tags=["chat"])
@@ -45,7 +45,21 @@ async def chat(bot_id: str, data: ChatRequest, db: AsyncSession = Depends(get_db
 
     context_chunks = retrieve_context(bot_id, data.message)
 
-    messages_for_llm: list[dict] = [{"role": "system", "content": bot.system_prompt}]
+    # Check if bot has MCP servers configured for tool calling
+    mcp_servers = None
+    if bot.mcp_servers:
+        try:
+            from app.schemas.bot import McpServerConfig
+            mcp_servers = [McpServerConfig(**s) for s in json.loads(bot.mcp_servers)]
+        except (json.JSONDecodeError, TypeError):
+            mcp_servers = None
+
+    # Enhanced system prompt when tools are available
+    system_prompt = bot.system_prompt
+    if mcp_servers:
+        system_prompt += "\n\nYou have access to tools that can help users. When using tools:\n\n1. Be conversational and natural - ask for required information in a friendly way\n2. Use tools when appropriate - don't just describe what they do\n3. If you need parameters for a tool, ask for them naturally in context\n4. Execute tools as soon as you have the required information\n5. After using a tool, explain what happened based on the result\n6. Be helpful and proactive in offering to use tools when they can solve user problems"
+    
+    messages_for_llm: list[dict] = [{"role": "system", "content": system_prompt}]
     if context_chunks:
         context_block = "\n\n---\n\n".join(context_chunks)
         messages_for_llm.append({
@@ -63,6 +77,70 @@ async def chat(bot_id: str, data: ChatRequest, db: AsyncSession = Depends(get_db
         full_response = []
         conv_id_sent = False
         try:
+            # Use tool-enabled streaming if MCP servers are configured
+            if mcp_servers:
+                from app.services.mcp_client import discover_tools, execute_tool_call
+                
+                # Discover available tools
+                server_configs = [s.model_dump() for s in mcp_servers]
+                toolkit = await discover_tools(server_configs, bot.mcp_token)
+                
+                
+                if toolkit.tools:
+                    # Create tool executor function
+                    async def tool_executor(tool_name: str, arguments: dict) -> str:
+                        server_url = toolkit.find_server_url(tool_name)
+                        if not server_url:
+                            return json.dumps({"error": f"Tool '{tool_name}' not found"})
+                        
+                        return await execute_tool_call(
+                            server_url=server_url,
+                            mcp_token=bot.mcp_token,
+                            tool_name=tool_name,
+                            arguments=arguments
+                        )
+                    
+                    # Use tool-enabled streaming
+                    async for event in chat_completion_stream_with_tools(
+                        provider=bot.provider,
+                        model_name=bot.model_name,
+                        messages=messages_for_llm,
+                        temperature=bot.temperature,
+                        max_tokens=bot.max_tokens,
+                        tools=toolkit.to_litellm_tools(),
+                        tool_executor=tool_executor,
+                    ):
+                        if event.type == "token":
+                            full_response.append(event.content)
+                            payload: dict = {"token": event.content}
+                            if not conv_id_sent:
+                                payload["conversation_id"] = conversation.id
+                                payload["context_chunks"] = context_chunks
+                                conv_id_sent = True
+                            yield f"data: {json.dumps(payload)}\n\n"
+                        elif event.type == "tool_call":
+                            payload = {
+                                "tool_call": {
+                                    "name": event.tool_name,
+                                    "arguments": event.arguments
+                                }
+                            }
+                            if not conv_id_sent:
+                                payload["conversation_id"] = conversation.id
+                                payload["context_chunks"] = context_chunks
+                                conv_id_sent = True
+                            yield f"data: {json.dumps(payload)}\n\n"
+                        elif event.type == "tool_result":
+                            payload = {
+                                "tool_result": {
+                                    "name": event.tool_name,
+                                    "result": event.result
+                                }
+                            }
+                            yield f"data: {json.dumps(payload)}\n\n"
+                    return
+            
+            # Fall back to regular streaming if no tools
             async for token in chat_completion_stream(
                 provider=bot.provider,
                 model_name=bot.model_name,

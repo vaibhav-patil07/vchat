@@ -39,7 +39,9 @@
   background: var(--vchat-primary);
   color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .vchat-trigger:hover {
@@ -227,8 +229,14 @@
 }
 
 @keyframes vchat-blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Input area */
@@ -340,4 +348,77 @@
   color: white;
   background: var(--vchat-primary);
   flex-shrink: 0;
+}
+
+/* Tool Pills */
+.vchat-tool-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px 8px;
+  border-top: 1px solid #e5e7eb;
+  background: var(--vchat-chat-bg);
+}
+
+.vchat-tool-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--vchat-primary);
+  color: white;
+  border: none;
+  border-radius: var(--vchat-radius, 8px);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--vchat-font);
+}
+
+.vchat-tool-pill:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.vchat-tool-pill:active {
+  transform: translateY(0);
+}
+
+.vchat-tool-pill-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.vchat-tool-pill-name {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.vchat-tool-pill-loading {
+  background: #6b7280;
+  color: white;
+  cursor: default;
+}
+
+.vchat-tool-pill-error {
+  background: #ef4444;
+  color: white;
+  cursor: default;
+}
+
+.vchat-tool-pill-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: vchat-spin 1s linear infinite;
+}
+
+@keyframes vchat-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

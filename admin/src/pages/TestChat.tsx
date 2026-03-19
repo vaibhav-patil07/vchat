@@ -1,32 +1,48 @@
-import { useState, useRef, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Send, ChevronDown, ChevronUp, User, Bot } from 'lucide-react';
-import { api } from '../api/client';
+import { useState, useRef, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ArrowLeft,
+  Send,
+  ChevronDown,
+  ChevronUp,
+  User,
+  Bot,
+} from "lucide-react";
+import { api } from "../api/client";
 
 interface ChatMessage {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   contextChunks?: string[];
+}
+
+interface ToolActivity {
+  toolName: string;
+  arguments: any;
+  result?: string;
+  timestamp: number;
 }
 
 export function TestChat() {
   const { id } = useParams<{ id: string }>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [conversationId, setConversationId] = useState<string | undefined>();
   const [expandedContext, setExpandedContext] = useState<number | null>(null);
+  const [toolActivity, setToolActivity] = useState<ToolActivity[]>([]);
+  const [showToolActivity, setShowToolActivity] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { data: bot } = useQuery({
-    queryKey: ['bot', id],
+    queryKey: ["bot", id],
     queryFn: () => api.bots.get(id!),
     enabled: !!id,
   });
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSend = async (e: React.FormEvent) => {
@@ -34,44 +50,68 @@ export function TestChat() {
     if (!input.trim() || isStreaming || !id) return;
 
     const userMessage = input.trim();
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setInput("");
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsStreaming(true);
 
     try {
       const res = await api.chat(id, userMessage, conversationId);
       const reader = res.body?.getReader();
-      if (!reader) throw new Error('No stream');
+      if (!reader) throw new Error("No stream");
 
       const decoder = new TextDecoder();
-      let assistantContent = '';
+      let assistantContent = "";
       let chunks: string[] = [];
 
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         const text = decoder.decode(value, { stream: true });
-        const lines = text.split('\n');
+        const lines = text.split("\n");
 
         for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
+          if (!line.startsWith("data: ")) continue;
           const data = line.slice(6).trim();
-          if (data === '[DONE]') continue;
+          if (data === "[DONE]") continue;
 
           try {
             const parsed = JSON.parse(data);
             if (parsed.error) throw new Error(parsed.error);
-            if (parsed.conversation_id) setConversationId(parsed.conversation_id);
+            if (parsed.conversation_id)
+              setConversationId(parsed.conversation_id);
             if (parsed.context_chunks) chunks = parsed.context_chunks;
+            
+            // Handle tool calls
+            if (parsed.tool_call) {
+              const activity: ToolActivity = {
+                toolName: parsed.tool_call.name,
+                arguments: parsed.tool_call.arguments,
+                timestamp: Date.now(),
+              };
+              setToolActivity(prev => [...prev, activity]);
+              setShowToolActivity(true);
+            }
+            
+            // Handle tool results
+            if (parsed.tool_result) {
+              setToolActivity(prev => 
+                prev.map(activity => 
+                  activity.toolName === parsed.tool_result.name && !activity.result
+                    ? { ...activity, result: parsed.tool_result.result }
+                    : activity
+                )
+              );
+            }
+            
             if (parsed.token) {
               assistantContent += parsed.token;
-              setMessages(prev => {
+              setMessages((prev) => {
                 const updated = [...prev];
                 updated[updated.length - 1] = {
-                  role: 'assistant',
+                  role: "assistant",
                   content: assistantContent,
                   contextChunks: chunks.length > 0 ? chunks : undefined,
                 };
@@ -84,9 +124,12 @@ export function TestChat() {
         }
       }
     } catch (err) {
-      setMessages(prev => [
+      setMessages((prev) => [
         ...prev.slice(0, -1),
-        { role: 'assistant', content: `Error: ${err instanceof Error ? err.message : 'Unknown error'}` },
+        {
+          role: "assistant",
+          content: `Error: ${err instanceof Error ? err.message : "Unknown error"}`,
+        },
       ]);
     } finally {
       setIsStreaming(false);
@@ -96,13 +139,21 @@ export function TestChat() {
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <div className="flex items-center gap-4 mb-4">
-        <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="w-4 h-4" />
           Back
         </Link>
-        <h1 className="text-lg font-bold text-foreground">Chat &mdash; {bot?.name}</h1>
+        <h1 className="text-lg font-bold text-foreground">
+          Chat &mdash; {bot?.name}
+        </h1>
         <button
-          onClick={() => { setMessages([]); setConversationId(undefined); }}
+          onClick={() => {
+            setMessages([]);
+            setConversationId(undefined);
+          }}
           className="ml-auto text-xs text-muted-foreground hover:text-foreground px-3 py-1 border border-border rounded-lg"
         >
           New Conversation
@@ -116,38 +167,54 @@ export function TestChat() {
           </div>
         )}
         {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
-            {msg.role === 'assistant' && (
+          <div
+            key={i}
+            className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}
+          >
+            {msg.role === "assistant" && (
               <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                 <Bot className="w-4 h-4 text-primary" />
               </div>
             )}
-            <div className={`max-w-[75%] ${msg.role === 'user' ? 'order-first' : ''}`}>
+            <div
+              className={`max-w-[75%] ${msg.role === "user" ? "order-first" : ""}`}
+            >
               <div
                 className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                  msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-br-md'
-                    : 'bg-secondary text-secondary-foreground rounded-bl-md'
+                  msg.role === "user"
+                    ? "bg-primary text-primary-foreground rounded-br-md"
+                    : "bg-secondary text-secondary-foreground rounded-bl-md"
                 }`}
               >
                 {msg.content}
-                {msg.role === 'assistant' && isStreaming && i === messages.length - 1 && (
-                  <span className="inline-block w-1.5 h-4 bg-primary ml-0.5 animate-pulse" />
-                )}
+                {msg.role === "assistant" &&
+                  isStreaming &&
+                  i === messages.length - 1 && (
+                    <span className="inline-block w-1.5 h-4 bg-primary ml-0.5 animate-pulse" />
+                  )}
               </div>
               {msg.contextChunks && msg.contextChunks.length > 0 && (
                 <div className="mt-1">
                   <button
-                    onClick={() => setExpandedContext(expandedContext === i ? null : i)}
+                    onClick={() =>
+                      setExpandedContext(expandedContext === i ? null : i)
+                    }
                     className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                   >
-                    {expandedContext === i ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                    {expandedContext === i ? (
+                      <ChevronUp className="w-3 h-3" />
+                    ) : (
+                      <ChevronDown className="w-3 h-3" />
+                    )}
                     {msg.contextChunks.length} context chunks used
                   </button>
                   {expandedContext === i && (
                     <div className="mt-2 space-y-2">
                       {msg.contextChunks.map((chunk, ci) => (
-                        <div key={ci} className="text-xs bg-accent border border-border rounded-lg p-3 text-accent-foreground whitespace-pre-wrap">
+                        <div
+                          key={ci}
+                          className="text-xs bg-accent border border-border rounded-lg p-3 text-accent-foreground whitespace-pre-wrap"
+                        >
                           {chunk}
                         </div>
                       ))}
@@ -156,7 +223,7 @@ export function TestChat() {
                 </div>
               )}
             </div>
-            {msg.role === 'user' && (
+            {msg.role === "user" && (
               <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-0.5">
                 <User className="w-4 h-4 text-secondary-foreground" />
               </div>
@@ -165,6 +232,63 @@ export function TestChat() {
         ))}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Tool Activity */}
+      {toolActivity.length > 0 && (
+        <div className="border border-border rounded-lg p-4 bg-accent/5 mb-4">
+          <button
+            onClick={() => setShowToolActivity(!showToolActivity)}
+            className="flex items-center gap-2 text-sm font-medium text-foreground mb-2 hover:text-primary transition-colors"
+          >
+            {showToolActivity ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+            Tool Activity ({toolActivity.length})
+          </button>
+          
+          {showToolActivity && (
+            <div className="space-y-3">
+              {toolActivity.map((activity, index) => (
+                <div key={index} className="bg-background border border-border rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm font-medium">{activity.toolName}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(activity.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                  
+                  <div className="text-xs space-y-2">
+                    <div>
+                      <span className="font-medium text-muted-foreground">Arguments:</span>
+                      <pre className="mt-1 bg-muted p-2 rounded text-xs overflow-x-auto">
+                        {JSON.stringify(activity.arguments, null, 2)}
+                      </pre>
+                    </div>
+                    
+                    {activity.result && (
+                      <div>
+                        <span className="font-medium text-muted-foreground">Result:</span>
+                        <div className="mt-1 bg-muted p-2 rounded text-xs whitespace-pre-wrap">
+                          {activity.result}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {!activity.result && (
+                      <div className="text-muted-foreground italic">
+                        Executing...
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <form onSubmit={handleSend} className="flex gap-3">
         <input
