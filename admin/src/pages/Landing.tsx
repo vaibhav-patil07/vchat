@@ -12,6 +12,7 @@ import {
   Sun,
   Moon,
   Monitor,
+  Wrench,
 } from 'lucide-react';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -20,6 +21,11 @@ const features = [
     icon: Bot,
     title: 'Bot as a Service',
     description: 'Create and deploy intelligent chatbots in minutes. Each bot is fully configurable with its own personality, rules, and knowledge.',
+  },
+  {
+    icon: Wrench,
+    title: 'Tool Calling (MCP)',
+    description: 'Connect external tools and services via Model Context Protocol. Your bots can execute actions, fetch data, and integrate with any API.',
   },
   {
     icon: Settings2,
@@ -50,8 +56,8 @@ const features = [
 
 const steps = [
   { step: '1', title: 'Create a Bot', description: 'Name it, choose a model provider, and set the system prompt.' },
-  { step: '2', title: 'Add Knowledge', description: 'Upload documents — they get chunked and embedded automatically.' },
-  { step: '3', title: 'Embed Anywhere', description: 'Use the React SDK to add the bot to your website or app.' },
+  { step: '2', title: 'Add Knowledge & Tools', description: 'Upload documents and configure MCP servers for external tool access.' },
+  { step: '3', title: 'Embed Anywhere', description: 'Use the React SDK to add the agentic bot to your website or app.' },
 ];
 
 export function Landing() {
@@ -101,13 +107,13 @@ export function Landing() {
             AI Chatbot Platform
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6">
-            Build AI Chatbots
+            Build Agentic AI Chatbots
             <br />
             <span className="text-primary">Powered by Your Data</span>
           </h1>
           <p className="max-w-2xl mx-auto text-lg text-muted-foreground mb-10">
-            Create intelligent, knowledge-aware chatbots with configurable LLM providers.
-            Upload your documents, pick a model, and embed a chat widget in any React app — all in minutes.
+            Create intelligent, knowledge-aware chatbots with tool calling capabilities.
+            Upload documents, connect external tools via MCP, and embed powerful agentic bots in any React app — all in minutes.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link
@@ -126,7 +132,7 @@ export function Landing() {
         <div className="text-center mb-14">
           <h2 className="text-3xl font-bold mb-3">Everything You Need</h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            A complete platform for building, managing, and deploying AI-powered chatbots with your own knowledge base.
+            A complete platform for building, managing, and deploying agentic AI chatbots with knowledge bases and tool calling capabilities.
           </p>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -145,6 +151,44 @@ export function Landing() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* MCP Tool Calling */}
+      <section className="bg-gradient-to-r from-primary/5 to-primary/10 border-y border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-medium rounded-full bg-primary/20 text-primary border border-primary/30">
+              <Wrench className="w-3 h-3" />
+              New: Tool Calling
+            </div>
+            <h2 className="text-3xl font-bold mb-3">Beyond Chat: Agentic Capabilities</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Your bots can now execute actions, not just answer questions. Connect external tools via Model Context Protocol (MCP) 
+              and transform your chatbots into powerful agents that can interact with APIs, databases, and services.
+            </p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                title: 'MCP Integration',
+                description: 'Connect any MCP-compatible tool or service. From email sending to database queries, your bot can do it all.',
+              },
+              {
+                title: 'Smart Parameter Collection',
+                description: 'Bots intelligently ask users for required parameters through natural conversation, no forms needed.',
+              },
+              {
+                title: 'Tool Pills UI',
+                description: 'Interactive tool buttons in the chat interface let users discover and trigger actions with a single click.',
+              },
+            ].map((item) => (
+              <div key={item.title} className="bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-6">
+                <h3 className="font-semibold text-card-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -203,10 +247,10 @@ export function Landing() {
       <section className="bg-primary">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <h2 className="text-3xl font-bold text-primary-foreground mb-3">
-            Ready to Build Your Bot?
+            Ready to Build Your Agentic Bot?
           </h2>
           <p className="text-primary-foreground/80 max-w-lg mx-auto mb-8">
-            Sign in to create your first AI chatbot, upload your knowledge base, and embed it anywhere.
+            Sign in to create your first agentic AI chatbot, upload your knowledge base, connect tools, and embed it anywhere.
           </p>
           <Link
             to="/login"
