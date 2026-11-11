@@ -30,9 +30,8 @@ const PROVIDERS = [
     value: "groq",
     label: "Groq (Cloud)",
     models: [
-      "llama-3.1-8b-instant",
-      "llama-3.3-70b-versatile",
       "meta-llama/llama-4-scout-17b-16e-instruct",
+      "llama-3.3-70b-versatile",
       "qwen/qwen3-32b",
     ],
     upcoming: false,
@@ -94,7 +93,7 @@ export function BotSettings() {
       };
 
       const newMcpServers = bot.mcp_servers || [];
-      
+
       let newToolConfig: ToolConfig;
       let newDiscoveredTools: Array<{
         name: string;
@@ -285,13 +284,12 @@ export function BotSettings() {
                           model_name: p.models[0],
                         }));
                     }}
-                    className={`relative px-4 py-3 rounded-lg border text-sm font-medium text-left transition-colors ${
-                      p.upcoming
+                    className={`relative px-4 py-3 rounded-lg border text-sm font-medium text-left transition-colors ${p.upcoming
                         ? "border-border bg-muted text-muted-foreground cursor-not-allowed opacity-60"
                         : isSelected
                           ? "border-primary bg-primary/5 text-primary ring-2 ring-primary"
                           : "border-input bg-background text-foreground hover:bg-secondary/50"
-                    }`}
+                      }`}
                   >
                     {p.label}
                     {p.upcoming && (
@@ -519,11 +517,10 @@ export function BotSettings() {
                       )}
                     </div>
                     <span
-                      className={`text-xs px-2 py-1 rounded ${
-                        server.status === "success"
+                      className={`text-xs px-2 py-1 rounded ${server.status === "success"
                           ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
                           : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
-                      }`}
+                        }`}
                     >
                       {server.status === "success" ? "Connected" : "Failed"}
                     </span>

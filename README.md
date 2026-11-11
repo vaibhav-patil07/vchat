@@ -104,3 +104,8 @@ docker compose up
 - **`<ChatWidget>`** — Floating chat bubble with popup panel.
 - **`<ChatWindow>`** — Inline chat component.
 - **`useVChat()`** — Headless hook for building custom chat UIs.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
