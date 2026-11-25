@@ -19,34 +19,6 @@ import {
   type McpTestResult,
 } from "../api/client";
 
-const PROVIDERS = [
-  {
-    value: "ollama",
-    label: "Ollama (Local)",
-    models: ["llama3.2:3b", "llama3.2:1b", "phi3.5", "gemma2:2b", "mistral"],
-    upcoming: true,
-  },
-  {
-    value: "groq",
-    label: "Groq (Cloud)",
-    models: [
-      "meta-llama/llama-4-scout-17b-16e-instruct",
-      "llama-3.3-70b-versatile",
-      "qwen/qwen3-32b",
-    ],
-    upcoming: false,
-  },
-  {
-    value: "together",
-    label: "Together AI (Cloud)",
-    models: [
-      "meta-llama/Llama-3.2-3B-Instruct-Turbo",
-      "Qwen/Qwen2.5-7B-Instruct-Turbo",
-    ],
-    upcoming: true,
-  },
-];
-
 export function BotSettings() {
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
@@ -75,6 +47,13 @@ export function BotSettings() {
     queryFn: () => api.bots.get(id!),
     enabled: !!id,
   });
+
+  const { data: modelsConfig } = useQuery({
+    queryKey: ["models"],
+    queryFn: api.models.list,
+  });
+
+  const providers = modelsConfig?.providers ?? [];
 
   const [form, setForm] = useState<BotUpdate>({});
 
@@ -197,7 +176,12 @@ export function BotSettings() {
     });
   };
 
-  const currentProvider = PROVIDERS.find((p) => p.value === form.provider);
+  const currentProvider = providers.find((p) => p.value === form.provider);
+  const availableModels = currentProvider?.models ?? [];
+  const modelOptions =
+    form.model_name && !availableModels.includes(form.model_name)
+      ? [form.model_name, ...availableModels]
+      : availableModels;
 
   if (isLoading) {
     return (
@@ -269,7 +253,7 @@ export function BotSettings() {
               Provider
             </label>
             <div className="grid gap-2 sm:grid-cols-3">
-              {PROVIDERS.map((p) => {
+              {providers.map((p) => {
                 const isSelected = (form.provider || "groq") === p.value;
                 return (
                   <button
@@ -281,7 +265,7 @@ export function BotSettings() {
                         setForm((f) => ({
                           ...f,
                           provider: p.value,
-                          model_name: p.models[0],
+                          model_name: p.models[0] || "",
                         }));
                     }}
                     className={`relative px-4 py-3 rounded-lg border text-sm font-medium text-left transition-colors ${p.upcoming
@@ -314,7 +298,7 @@ export function BotSettings() {
               }
               className="w-full px-3 py-2 border border-input rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              {currentProvider?.models.map((m) => (
+              {modelOptions.map((m) => (
                 <option key={m} value={m}>
                   {m}
                 </option>

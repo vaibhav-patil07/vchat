@@ -18,8 +18,11 @@ async def get_db() -> AsyncSession:
 
 
 async def init_db():
-    from app.models import bot, conversation, document, user  # noqa: F401
+    import json
+    from app.models import bot, config, conversation, document, user  # noqa: F401
+    from app.models.config import AppConfig
     from app.models.user import AllowedUser
+    from app.schemas.config import BOT_MODELS_CONFIG_KEY, DEFAULT_MODEL_PROVIDERS
 
     settings = get_settings()
 
@@ -49,4 +52,14 @@ async def init_db():
                 email="guest",
                 bot_limit=settings.guest_bot_limit,
             ))
-            await session.commit()
+
+        models_result = await session.execute(
+            select(AppConfig).where(AppConfig.key == BOT_MODELS_CONFIG_KEY)
+        )
+        if not models_result.scalar_one_or_none():
+            session.add(AppConfig(
+                key=BOT_MODELS_CONFIG_KEY,
+                value=json.dumps(DEFAULT_MODEL_PROVIDERS),
+            ))
+
+        await session.commit()

@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Bot, MessageSquare, LogOut, Users, Sun, Moon, Monitor, Code2 } from 'lucide-react';
+import { Bot, MessageSquare, LogOut, Users, Cpu, Sun, Moon, Monitor, Code2 } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -44,6 +44,7 @@ export function Layout() {
               {navLink('/', 'Bots', Bot, (p) => p === '/' || p.startsWith('/bots'))}
               {navLink('/integration', 'SDK', Code2, (p) => p === '/integration')}
               {user?.role === 'admin' && navLink('/users', 'Users', Users, (p) => p === '/users')}
+              {user?.role === 'admin' && navLink('/models', 'Models', Cpu, (p) => p === '/models')}
               <button
                 onClick={cycleTheme}
                 className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"

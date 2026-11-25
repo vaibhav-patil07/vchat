@@ -10,6 +10,7 @@ import { BotSettings } from './pages/BotSettings';
 import { KnowledgeBase } from './pages/KnowledgeBase';
 import { TestChat } from './pages/TestChat';
 import { Users } from './pages/Users';
+import { ModelsConfig } from './pages/ModelsConfig';
 import { Integration } from './pages/Integration';
 import { ChatHistory } from './pages/ChatHistory';
 import { Login } from './pages/Login';
@@ -37,6 +38,7 @@ function AppRoutes() {
       <Route element={<Layout />}>
         <Route path="/" element={<Dashboard />} />
         {user.role === 'admin' && <Route path="/users" element={<Users />} />}
+        {user.role === 'admin' && <Route path="/models" element={<ModelsConfig />} />}
         <Route path="/integration" element={<Integration />} />
         <Route path="/bots/:id/settings" element={<BotSettings />} />
         <Route path="/bots/:id/knowledge" element={<KnowledgeBase />} />

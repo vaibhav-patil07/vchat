@@ -136,6 +136,17 @@ export interface AllowedUser {
   created_at: string;
 }
 
+export interface ProviderModelConfig {
+  value: string;
+  label: string;
+  models: string[];
+  upcoming: boolean;
+}
+
+export interface BotModelsConfig {
+  providers: ProviderModelConfig[];
+}
+
 export const api = {
   requestAccess: (email: string, description: string) =>
     request<{ message: string }>("/auth/request-access", {
@@ -201,5 +212,13 @@ export const api = {
       }),
     remove: (id: string) =>
       request<void>(`/admin/users/${id}`, { method: "DELETE" }),
+  },
+  models: {
+    list: () => request<BotModelsConfig>("/models"),
+    update: (providers: ProviderModelConfig[]) =>
+      request<BotModelsConfig>("/admin/models", {
+        method: "PUT",
+        body: JSON.stringify({ providers }),
+      }),
   },
 };

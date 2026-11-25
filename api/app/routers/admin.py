@@ -1,8 +1,15 @@
+import json
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
+from app.models.config import AppConfig
 from app.models.user import AllowedUser
+from app.schemas.config import (
+    BOT_MODELS_CONFIG_KEY,
+    DEFAULT_MODEL_PROVIDERS,
+    BotModelsConfig,
+)
 from app.schemas.user import UserCreate, UserUpdate, UserResponse
 from app.auth import AuthUser, require_auth
 
@@ -75,3 +82,35 @@ async def remove_user(
         raise HTTPException(400, "Cannot delete the Guest user")
     await db.delete(user)
     await db.commit()
+
+
+@router.get("/models", response_model=BotModelsConfig)
+async def get_bot_models(
+    db: AsyncSession = Depends(get_db),
+    _: AuthUser = Depends(require_auth),
+):
+    config = await db.get(AppConfig, BOT_MODELS_CONFIG_KEY)
+    if not config:
+        return BotModelsConfig(providers=DEFAULT_MODEL_PROVIDERS)
+    try:
+        providers = json.loads(config.value)
+        return BotModelsConfig(providers=providers)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return BotModelsConfig(providers=DEFAULT_MODEL_PROVIDERS)
+
+
+@router.put("/admin/models", response_model=BotModelsConfig)
+async def update_bot_models(
+    data: BotModelsConfig,
+    db: AsyncSession = Depends(get_db),
+    _: AuthUser = Depends(_require_admin),
+):
+    serialized = json.dumps([p.model_dump() for p in data.providers])
+    config = await db.get(AppConfig, BOT_MODELS_CONFIG_KEY)
+    if config:
+        config.value = serialized
+    else:
+        config = AppConfig(key=BOT_MODELS_CONFIG_KEY, value=serialized)
+        db.add(config)
+    await db.commit()
+    return data
