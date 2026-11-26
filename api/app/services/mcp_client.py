@@ -1,9 +1,16 @@
 import json
 import logging
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 
 from mcp import ClientSession
-from mcp.client.streamable_http import streamablehttp_client
+
+try:
+    from mcp.client.streamable_http import create_mcp_http_client, streamable_http_client
+except ImportError:
+    create_mcp_http_client = None
+    streamable_http_client = None
+    from mcp.client.streamable_http import streamablehttp_client
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +49,11 @@ class McpToolkit:
         return None
 
 
+def _tool_parameters(tool) -> dict:
+    """Extract JSON schema parameters across old (`inputSchema`) and new (`input_schema`) mcp SDK versions."""
+    return getattr(tool, "input_schema", None) or getattr(tool, "inputSchema", None) or {}
+
+
 def _build_headers(mcp_token: str | None, extra_headers: dict[str, str] | None = None) -> dict[str, str]:
     headers: dict[str, str] = {}
     if mcp_token:
@@ -49,6 +61,25 @@ def _build_headers(mcp_token: str | None, extra_headers: dict[str, str] | None =
     if extra_headers:
         headers.update(extra_headers)
     return headers
+
+
+@asynccontextmanager
+async def _connect_mcp(url: str, headers: dict[str, str]):
+    """Connect to an MCP StreamableHTTP server across old and new mcp SDK versions."""
+    if streamable_http_client is not None and create_mcp_http_client is not None:
+        async with create_mcp_http_client(headers=headers) as http_client:
+            async with streamable_http_client(url, http_client=http_client) as (
+                read_stream,
+                write_stream,
+            ):
+                yield read_stream, write_stream
+    else:
+        async with streamablehttp_client(url, headers=headers) as (
+            read_stream,
+            write_stream,
+            _,
+        ):
+            yield read_stream, write_stream
 
 
 async def discover_tools(
@@ -70,7 +101,7 @@ async def discover_tools(
         headers = _build_headers(mcp_token, extra_headers)
 
         try:
-            async with streamablehttp_client(url, headers=headers) as (read_stream, write_stream, _):
+            async with _connect_mcp(url, headers) as (read_stream, write_stream):
                 async with ClientSession(read_stream, write_stream) as session:
                     await session.initialize()
                     tools_result = await session.list_tools()
@@ -79,7 +110,7 @@ async def discover_tools(
                         mcp_tool = McpTool(
                             name=tool.name,
                             description=tool.description or "",
-                            parameters=tool.inputSchema or {},
+                            parameters=_tool_parameters(tool),
                             server_url=url,
                         )
                         toolkit.tools.append(mcp_tool)
@@ -124,7 +155,7 @@ async def discover_tools_with_status(
         headers = _build_headers(mcp_token, extra_headers)
 
         try:
-            async with streamablehttp_client(url, headers=headers) as (read_stream, write_stream, _):
+            async with _connect_mcp(url, headers) as (read_stream, write_stream):
                 async with ClientSession(read_stream, write_stream) as session:
                     await session.initialize()
                     tools_result = await session.list_tools()
@@ -134,7 +165,7 @@ async def discover_tools_with_status(
                         mcp_tool = McpTool(
                             name=tool.name,
                             description=tool.description or "",
-                            parameters=tool.inputSchema or {},
+                            parameters=_tool_parameters(tool),
                             server_url=url,
                         )
                         toolkit.tools.append(mcp_tool)
@@ -169,10 +200,9 @@ async def execute_tool_call(
     headers = _build_headers(mcp_token, extra_headers)
 
     try:
-        async with streamablehttp_client(server_url, headers=headers) as (
+        async with _connect_mcp(server_url, headers) as (
             read_stream,
             write_stream,
-            _,
         ):
             async with ClientSession(read_stream, write_stream) as session:
                 await session.initialize()
